@@ -526,6 +526,7 @@ export class TransactionDetails extends Component<TransactionDetailsProps, State
 
     return (
       <Fragment>
+<<<<<<< HEAD
         <SceneWrapper background="body" bodySplit={scale(24)}>
           <ScrollView
             keyboardShouldPersistTaps="handled"
@@ -588,6 +589,12 @@ export class TransactionDetails extends Component<TransactionDetailsProps, State
               />
             </View>
           </ScrollView>
+=======
+        <SceneWrapper bodySplit={scale(24)}>
+          <View style={styles.container}>
+            <View style={styles.tileContainer}></View>
+          </View>
+>>>>>>> fa973926d... Started Redesign
         </SceneWrapper>
         {this.state.contactSearchVisibility && this.renderPayeeSearch()}
         {this.state.subCategorySelectVisibility && this.renderCategorySearch()}
