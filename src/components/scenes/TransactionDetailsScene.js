@@ -1,6 +1,6 @@
 // @flow
 
-import { bns } from 'biggystring'
+import { abs, sub, bns } from 'biggystring'
 import dateformat from 'dateformat'
 import type { EdgeCurrencyInfo, EdgeDenomination, EdgeMetadata, EdgeTransaction } from 'edge-core-js'
 import React, { Component, Fragment } from 'react'
@@ -26,6 +26,7 @@ import { createAdvancedTransactionDetailsModal } from '../modals/AdvancedTransac
 import { showError } from '../services/AirshipInstance.js'
 import { Icon } from '../../modules/UI/components/Icon/Icon.ui.js'
 import * as Constants from '../../constants/indexConstants'
+import * as UTILS from '../../util/utils'
 
 const EXCHANGE_TEXT = s.strings.fragment_transaction_exchange
 const EXPENSE_TEXT = s.strings.fragment_transaction_expense
@@ -520,11 +521,58 @@ export class TransactionDetails extends Component<TransactionDetailsProps, State
   }
 
   render () {
-    const categoryColor = categories[this.state.category].color
-    let txExplorerLink = null
-    if (this.props.currencyInfo) {
-      txExplorerLink = sprintf(this.props.currencyInfo.transactionExplorer, this.props.edgeTransaction.txid)
+    let feeSyntax, leftData, convertedAmount, amountString, symbolString, feeDenomination
+    const { guiWallet, fiatSymbol } = this
+    const { edgeTransaction } = this.props
+    const { walletDefaultDenomProps, direction, amountFiat } = this.state
+    const absoluteAmount = abs(this.props.edgeTransaction.nativeAmount)
+    if (isCryptoParentCurrency(guiWallet, edgeTransaction.currencyCode)) {
+      symbolString = walletDefaultDenomProps.symbol ? walletDefaultDenomProps.symbol + ' ' : ''
+    } else {
+      symbolString = ''
     }
+
+    if (direction === 'receive') {
+      convertedAmount = UTILS.convertNativeToDisplay(walletDefaultDenomProps.multiplier)(absoluteAmount) // convert to correct denomiation
+      amountString = UTILS.decimalOrZero(UTILS.truncateDecimals(convertedAmount, 6), 6) // limit to 6 decimals, check if infinitesimal, and remove unnecessary trailing zeroes
+      feeSyntax = ''
+      leftData = {
+        color: THEME.COLORS.ACCENT_BLUE,
+        syntax: s.strings.fragment_transaction_income
+      }
+    } else {
+      // send tx
+      if (edgeTransaction.networkFee) {
+        // stub, check BTC vs. ETH (parent currency)
+        feeDenomination = walletDefaultDenomProps.name
+        convertedAmount = UTILS.convertNativeToDisplay(this.props.walletDefaultDenomProps.multiplier)(absoluteAmount) // convert the native amount to correct *denomination*
+        const convertedFee = UTILS.convertNativeToDisplay(this.props.walletDefaultDenomProps.multiplier)(this.props.edgeTransaction.networkFee) // convert fee to correct denomination
+        const amountMinusFee = sub(convertedAmount, convertedFee) // for outgoing tx substract fee from total amount
+        const amountTruncatedDecimals = UTILS.truncateDecimals(amountMinusFee.toString(), 6) // limit to 6 decimals, at most
+        amountString = UTILS.decimalOrZero(amountTruncatedDecimals, 6) // change infinitesimal values to zero, otherwise cut off insignificant zeroes (at end of decimal)
+        const feeString = abs(UTILS.truncateDecimals(convertedFee, 6)) // fee should never be negative
+        feeSyntax = symbolString
+          ? sprintf(s.strings.fragment_tx_detail_mining_fee_with_symbol, symbolString, feeString)
+          : sprintf(s.strings.fragment_tx_detail_mining_fee_with_denom, feeString, feeDenomination)
+        leftData = {
+          color: THEME.COLORS.ACCENT_RED,
+          syntax: s.strings.fragment_transaction_expense
+        }
+      } else {
+        // do not show fee, because token
+        amountString = absoluteAmount
+        feeSyntax = ''
+        leftData = {
+          color: THEME.COLORS.ACCENT_RED,
+          syntax: s.strings.fragment_transaction_expense
+        }
+      }
+    }
+    const fiatValue = UTILS.truncateDecimals(amountFiat.toString().replace('-', ''), 2, true)
+    const fiatString = `${fiatSymbol}${fiatValue}`
+    const { fiatCurrencyCode } = guiWallet
+
+    const cryptoAmountString = `${symbolString}${amountString}`
 
     return (
       <Fragment>
@@ -541,12 +589,12 @@ export class TransactionDetails extends Component<TransactionDetailsProps, State
               </View>
               <View style={styles.tileContainer}>
                 <FormattedText style={styles.tileTextTop}>Bitcoin Amount</FormattedText>
-                <FormattedText style={styles.tileTextBottom}>b 0.029486 (+10 fee)</FormattedText>
+                <FormattedText style={styles.tileTextBottom}>{cryptoAmountString} (+10 fee)</FormattedText>
               </View>
               <View style={styles.tileContainer}>
                 <Icon type={Constants.ION_ICONS} name={Constants.CREATE_OUTLINE} size={16} style={styles.tileIcon}/>
-                <FormattedText style={styles.tileTextTop}>Amount in USD</FormattedText>
-                <FormattedText style={styles.tileTextBottom}>$300.49</FormattedText>
+                <FormattedText style={styles.tileTextTop}>Amount in {fiatCurrencyCode}</FormattedText>
+                <FormattedText style={styles.tileTextBottom}>{fiatString}</FormattedText>
               </View>
               <View style={styles.tileContainer}>
                 <FormattedText style={styles.tileTextTop}>Amount at Current Price</FormattedText>
