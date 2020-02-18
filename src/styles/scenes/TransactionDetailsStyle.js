@@ -98,6 +98,27 @@ export const styles = {
     marginHorizontal: THEME.rem(0.7),
     color: THEME.COLORS.GRAY_5
   },
+  airshipContainer: {
+    flex: 1,
+    padding: THEME.rem(0.8)
+  },
+  airshipHeader: {
+    fontSize: THEME.rem(1.2),
+    marginBottom: THEME.rem(1),
+    alignSelf: 'center'
+  },
+  notesInputWrap: {
+    borderWidth: 1,
+    borderColor: '#CCCCCC',
+    borderRadius: 3,
+    height: PLATFORM.deviceHeight * 0.13 - (PLATFORM.platform === 'android' ? scale(20) : 0),
+    paddingVertical: THEME.rem(0.1),
+    paddingHorizontal: THEME.rem(0.8)
+  },
+  fiatInput: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#CCCCCC',
+  },
 
   //old style
   searchPopup: {

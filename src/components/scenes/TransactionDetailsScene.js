@@ -4,7 +4,7 @@ import { abs, sub, bns } from 'biggystring'
 import dateformat from 'dateformat'
 import type { EdgeCurrencyInfo, EdgeDenomination, EdgeMetadata, EdgeTransaction } from 'edge-core-js'
 import React, { Component, Fragment } from 'react'
-import { Animated, Easing, Keyboard, ScrollView, TextInput, TouchableOpacity, View } from 'react-native'
+import { Animated, Easing, Keyboard, ScrollView, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import slowlog from 'react-native-slowlog'
 import { sprintf } from 'sprintf-js'
 
@@ -27,6 +27,8 @@ import { showError } from '../services/AirshipInstance.js'
 import { Icon } from '../../modules/UI/components/Icon/Icon.ui.js'
 import * as Constants from '../../constants/indexConstants'
 import * as UTILS from '../../util/utils'
+import { type AirshipBridge, AirshipModal } from '../modals/modalParts'
+import { Airship } from '../services/AirshipInstance.js'
 
 const EXCHANGE_TEXT = s.strings.fragment_transaction_exchange
 const EXPENSE_TEXT = s.strings.fragment_transaction_expense
@@ -279,15 +281,6 @@ export class TransactionDetails extends Component<TransactionDetailsProps, State
     })
   }
 
-  onFocusNotes = () => {
-    this.refs._scrollView.scrollTo({ x: 0, y: 300, animated: true })
-  }
-
-  onBlurNotes = () => {
-    Keyboard.dismiss()
-    this.refs._scrollView.scrollTo({ x: 0, y: 0, animated: true })
-  }
-
   onNotesKeyboardReturn = () => {
     this.onBlurNotes()
   }
@@ -387,7 +380,6 @@ export class TransactionDetails extends Component<TransactionDetailsProps, State
         amountFiat: ''
       })
     }
-    this.refs._scrollView.scrollTo({ x: 0, y: 90, animated: true })
   }
 
   onPressAdvancedDetailsButton = async () => {
@@ -520,6 +512,66 @@ export class TransactionDetails extends Component<TransactionDetailsProps, State
     )
   }
 
+  renderNotesInput () {
+    const notes = this.props.edgeTransaction.metadata ? this.props.edgeTransaction.metadata.notes : ''
+    Airship.show(bridge => (
+      <AirshipModal bridge={bridge} onCancel={() => bridge.resolve(null)}>
+        <TouchableWithoutFeedback onPress={() => bridge.resolve(null)}>
+          <View style={styles.airshipContainer}>
+            <FormattedText style={styles.airshipHeader}>{s.strings.transaction_details_notes_title}</FormattedText>
+            <TouchableWithoutFeedback onPress={() => this.notesInput.focus()}>
+              <View style={[styles.notesInputWrap]}>
+                <TextInput
+                  autoFocus
+                  multiline
+                  underlineColorAndroid={'transparent'}
+                  onChangeText={this.onChangeNotes}
+                  defaultValue={notes}
+                  style={[styles.notesInput]}
+                  placeholderTextColor={THEME.COLORS.GRAY_}
+                  placeholder={s.strings.transaction_details_notes_title}
+                  autoCapitalize="sentences"
+                  autoCorrect={false}
+                  ref={ref => { this.notesInput = ref }}
+                />
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </AirshipModal>
+    )).then((_) => {
+      this.onSaveTxDetails()
+    })
+  }
+
+  renderFiatInput () {
+    const { fiatCurrencyCode } = this.guiWallet
+    Airship.show(bridge => (
+      <AirshipModal bridge={bridge} onCancel={() => bridge.resolve(null)}>
+        <TouchableWithoutFeedback onPress={() => bridge.resolve(null)}>
+          <View style={styles.airshipContainer}>
+            <FormattedText style={styles.airshipHeader}>{fiatCurrencyCode} AMOUNT</FormattedText>
+              <TextInput
+                underlineColorAndroid={'transparent'}
+                returnKeyType="done"
+                autoCapitalize="none"
+                autoCorrect={false}
+                onFocus={this.onFocusFiatAmount}
+                onBlur={this.onBlurFiat}
+                onChangeText={this.onChangeFiat}
+                style={styles.fiatInput}
+                keyboardType="numeric"
+                value={UTILS.truncateDecimals(this.state.amountFiat.toString().replace('-', ''), 2, true)}
+              />
+          </View>
+        </TouchableWithoutFeedback>
+      </AirshipModal>
+    )).then((_) => {
+      this.onSaveTxDetails()
+    })
+  }
+
+
   render () {
     let feeSyntax, leftData, convertedAmount, amountString, symbolString, feeDenomination
     const { guiWallet, fiatSymbol } = this
@@ -574,6 +626,9 @@ export class TransactionDetails extends Component<TransactionDetailsProps, State
 
     const cryptoAmountString = `${symbolString}${amountString}`
 
+    const notes = this.props.edgeTransaction.metadata ? this.props.edgeTransaction.metadata.notes : ''
+    const payeeName = this.state.payeeName && this.state.payeeName !== '' ? this.state.payeeName : 'Payee Name'
+
     return (
       <Fragment>
         <SceneWrapper bodySplit={scale(24)}>
@@ -584,18 +639,20 @@ export class TransactionDetails extends Component<TransactionDetailsProps, State
                 <FormattedText style={styles.tileTextTop}>Recipent Name</FormattedText>
                 <View style={styles.tileRow}>
                   <Icon type={Constants.ION_ICONS} name={Constants.CONTACT} size={iconSize.avatar} style={styles.tileAvatarIcon}/>
-                  <FormattedText style={styles.tileTextBottom}>Raquel Wallace</FormattedText>
+                  <FormattedText style={styles.tileTextBottom}>{ payeeName }</FormattedText>
                 </View>
               </View>
               <View style={styles.tileContainer}>
                 <FormattedText style={styles.tileTextTop}>Bitcoin Amount</FormattedText>
                 <FormattedText style={styles.tileTextBottom}>{cryptoAmountString} (+10 fee)</FormattedText>
               </View>
-              <View style={styles.tileContainer}>
-                <Icon type={Constants.ION_ICONS} name={Constants.CREATE_OUTLINE} size={16} style={styles.tileIcon}/>
-                <FormattedText style={styles.tileTextTop}>Amount in {fiatCurrencyCode}</FormattedText>
-                <FormattedText style={styles.tileTextBottom}>{fiatString}</FormattedText>
-              </View>
+              <TouchableWithoutFeedback onPress={this.renderFiatInput}>
+                <View style={styles.tileContainer}>
+                  <Icon type={Constants.ION_ICONS} name={Constants.CREATE_OUTLINE} size={16} style={styles.tileIcon}/>
+                  <FormattedText style={styles.tileTextTop}>Amount in {fiatCurrencyCode}</FormattedText>
+                  <FormattedText style={styles.tileTextBottom}>{fiatString}</FormattedText>
+                </View>
+              </TouchableWithoutFeedback>
               <View style={styles.tileContainer}>
                 <FormattedText style={styles.tileTextTop}>Amount at Current Price</FormattedText>
                   <View style={styles.tileRow}>
@@ -613,11 +670,13 @@ export class TransactionDetails extends Component<TransactionDetailsProps, State
                     <FormattedText style={styles.subCategoryText}>Salary</FormattedText>
                   </View>
               </View>
-              <View style={styles.tileContainerBig}>
-                <Icon type={Constants.ION_ICONS} name={Constants.CREATE_OUTLINE} size={16} style={styles.tileIcon}/>
-                <FormattedText style={styles.tileTextTop}>Notes</FormattedText>
-                <FormattedText style={styles.tileTextNotes}>These are my notes for this week’s salary. Have a good rest of the week!</FormattedText>
-              </View>
+              <TouchableWithoutFeedback onPress={this.renderNotesInput}>
+                <View style={styles.tileContainerBig}>
+                  <Icon type={Constants.ION_ICONS} name={Constants.CREATE_OUTLINE} size={16} style={styles.tileIcon}/>
+                  <FormattedText style={styles.tileTextTop}>Notes</FormattedText>
+                  <FormattedText style={styles.tileTextNotes}>{notes}</FormattedText>
+                </View>
+              </TouchableWithoutFeedback>
               <FormattedText style={styles.textTransactionData}>View Advance Transaction Data</FormattedText>
             </View>
           </View>
