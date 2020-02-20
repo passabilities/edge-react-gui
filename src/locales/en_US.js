@@ -604,7 +604,8 @@ const strings = {
   wallet_list_modal_header_mru: 'Most Recent Wallets',
   wallet_list_modal_header_all: 'All Wallets',
   earn_interest: 'Earn Interest',
-  earn_interest_on: 'Earn Interest on %s'
+  earn_interest_on: 'Earn Interest on %s',
+  choose_an_amount: 'Choose an amount'
 }
 
 // export default strings
