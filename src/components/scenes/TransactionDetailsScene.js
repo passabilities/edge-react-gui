@@ -195,7 +195,6 @@ export class TransactionDetails extends Component<TransactionDetailsProps, State
   onBlurPayee = () => {
     this.disablePayeeVisibility()
     Keyboard.dismiss()
-    this.refs._scrollView.scrollTo({ x: 0, y: 0, animated: true })
   }
 
   enablePayeeVisibility = () => {
@@ -573,13 +572,15 @@ export class TransactionDetails extends Component<TransactionDetailsProps, State
   }
 
   renderPayeeInput () {
+    const payee = this.state.direction === 'send' ? s.strings.transaction_details_recepient : s.strings.transaction_details_sender
     Airship.show(bridge => (
       <AirshipModal bridge={bridge} onCancel={() => bridge.resolve(null)}>
         <TouchableWithoutFeedback onPress={() => bridge.resolve(null)}>
           <View style={styles.airshipContainer}>
-            <FormattedText style={styles.airshipHeader}>Payee Search</FormattedText>
+            <FormattedText style={styles.airshipHeader}>sprintf(s.strings.transaction_details_payee_input, payee)</FormattedText>
               <FormField
                 autoFocus
+                label="Choose a recipient"
                 autoCapitalize="words"
                 onFocus={this.onFocusPayee}
                 onChangeText={this.onChangePayee}
@@ -589,13 +590,12 @@ export class TransactionDetails extends Component<TransactionDetailsProps, State
                 style={materialInput}
               />
               <ContactSearchResults
-                // bottomGap={gap.bottom}
                 onChangePayee={this.onSelectPayee}
                 contacts={this.props.contacts}
                 currentPayeeText={this.state.payeeName || ''}
                 onSelectPayee={this.onSelectPayee}
-                blurOnSubmit
                 onBlur={this.onBlurPayee}
+                blurOnSubmit
               />
           </View>
         </TouchableWithoutFeedback>
