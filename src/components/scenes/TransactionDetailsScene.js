@@ -31,6 +31,9 @@ import { type AirshipBridge, AirshipModal } from '../modals/modalParts'
 import { Airship } from '../services/AirshipInstance.js'
 import { FormField } from '../common/FormField.js'
 import { PrimaryButton } from '../../modules/UI/components/Buttons/index'
+import type { GuiContact, GuiWallet } from '../../types/types.js'
+import { TransactionDetailsPayeeInput } from '../common/TransactionDetailsPayeeInput'
+import { TransactionDetailsFiatInput } from '../common/TransactionDetailsFiatInput'
 
 const EXCHANGE_TEXT = s.strings.fragment_transaction_exchange
 const EXPENSE_TEXT = s.strings.fragment_transaction_expense
@@ -228,42 +231,8 @@ export class TransactionDetails extends Component<TransactionDetailsProps, State
   onSelectPayee = (payeeName: string, thumbnail: string) => {
     this.onChangePayee(payeeName, thumbnail)
     this.onBlurPayee()
-    this.refs._scrollView.scrollTo({ x: 0, y: 0, animated: true })
   }
 
-  onChangeFiat = (input: string) => {
-    // This next chained statement / expression is to ensure only one decimal place. Remember decimals are commas in some locales
-    // double-check that this implementation change works!
-    const newInputStripped = input
-      .replace(/[^\d.,]/, '')
-      .replace(/\./, 'x')
-      .replace(/\./g, '')
-      .replace(/x/, '.')
-      .replace(/,/, 'x')
-      .replace(/,/g, '')
-      .replace(/x/, ',')
-    const newInputFiltered =
-      (isNaN(newInputStripped.replace(',', '.')) && (newInputStripped !== ',' && newInputStripped !== '.')) || newInputStripped === '' ? '' : newInputStripped
-    this.setState({
-      amountFiat: newInputFiltered
-    })
-  }
-
-  onBlurFiat = () => {
-    // needs badly to be flowed and / or research best practices for converting TextInput to float / fiat
-    // keep in mind that TextField returns a string, and amountFiat will need to be a floating point number
-    let amountFiat
-    if (parseFloat(this.state.amountFiat)) {
-      const amountFiatOneDecimal = this.state.amountFiat.toString().replace(/[^\d.,]/, '')
-      const absoluteAmountFiatOneDecimal = bns.abs(amountFiatOneDecimal)
-      amountFiat = bns.toFixed(absoluteAmountFiatOneDecimal, 2, 2)
-    } else {
-      amountFiat = intl.formatNumber('0.00')
-    }
-    this.setState({
-      amountFiat
-    })
-  }
 
   onChangeCategory = (input: string) => {
     this.setState({
@@ -541,65 +510,31 @@ export class TransactionDetails extends Component<TransactionDetailsProps, State
           </View>
         </TouchableWithoutFeedback>
       </AirshipModal>
-    )).then((_) => {
-      this.onSaveTxDetails()
-    })
-  }
-
-  renderFiatInput () {
-    const { fiatCurrencyCode } = this.guiWallet
-    Airship.show(bridge => (
-      <AirshipModal bridge={bridge} onCancel={() => bridge.resolve(null)}>
-        <TouchableWithoutFeedback onPress={() => bridge.resolve(null)}>
-          <View style={styles.airshipContainer}>
-            <FormattedText style={styles.airshipHeader}>{fiatCurrencyCode} AMOUNT</FormattedText>
-              <FormField
-                autoFocus
-                clearButtonMode={'while-editing'}
-                label={s.strings.choose_an_amount}
-                returnKeyType="done"
-                autoCapitalize="none"
-                onFocus={this.onFocusFiatAmount}
-                onBlur={this.onBlurFiat}
-                onChangeText={this.onChangeFiat}
-                keyboardType="numeric"
-                value={UTILS.truncateDecimals(this.state.amountFiat.toString().replace('-', ''), 2, true)}
-              />
-          </View>
-        </TouchableWithoutFeedback>
-      </AirshipModal>
     )).then(_ => {})
   }
 
-  renderPayeeInput () {
-    const payee = this.state.direction === 'send' ? s.strings.transaction_details_recepient : s.strings.transaction_details_sender
+  onChangeFiat = (amountFiat: string) =>  this.setState({ amountFiat })
+  renderFiatInput () {
     Airship.show(bridge => (
-      <AirshipModal bridge={bridge} onCancel={() => bridge.resolve(null)}>
-        <TouchableWithoutFeedback onPress={() => bridge.resolve(null)}>
-          <View style={styles.airshipContainer}>
-            <FormattedText style={styles.airshipHeader}>sprintf(s.strings.transaction_details_payee_input, payee)</FormattedText>
-              <FormField
-                autoFocus
-                label="Choose a recipient"
-                autoCapitalize="words"
-                onFocus={this.onFocusPayee}
-                onChangeText={this.onChangePayee}
-                autoCorrect={false}
-                placeholder={s.strings.transaction_details_payee}
-                defaultValue={this.state.payeeName}
-                style={materialInput}
-              />
-              <ContactSearchResults
-                onChangePayee={this.onSelectPayee}
-                contacts={this.props.contacts}
-                currentPayeeText={this.state.payeeName || ''}
-                onSelectPayee={this.onSelectPayee}
-                onBlur={this.onBlurPayee}
-                blurOnSubmit
-              />
-          </View>
-        </TouchableWithoutFeedback>
-      </AirshipModal>
+      <TransactionDetailsFiatInput
+        bridge={bridge}
+        currency={this.guiWallet.fiatCurrencyCode}
+        amount={this.state.amountFiat}
+        onChange={this.onChangeFiat}
+      />
+    )).then(_ => {})
+  }
+
+  openPayeeInput () {
+    const payeeStatus = this.state.direction === 'send' ? s.strings.transaction_details_recepient : s.strings.transaction_details_sender
+    Airship.show(bridge => (
+      <TransactionDetailsPayeeInput
+        bridge={bridge}
+        payeeStatus={payeeStatus}
+        payeeName={this.state.payeeName}
+        onChangePayee={this.onChangePayee}
+        contacts={this.props.contacts}
+      />
     )).then(_ => {})
   }
 
@@ -665,7 +600,7 @@ export class TransactionDetails extends Component<TransactionDetailsProps, State
         <SceneWrapper bodySplit={scale(24)}>
           <View style={styles.container}>
             <View style={styles.tilesContainer}>
-              <TouchableWithoutFeedback onPress={this.renderPayeeInput}>
+              <TouchableWithoutFeedback onPress={this.openPayeeInput}>
                 <View style={styles.tileContainerBig}>
                   <Icon type={Constants.ION_ICONS} name={Constants.CREATE_OUTLINE} size={16} style={styles.tileIcon}/>
                   <FormattedText style={styles.tileTextTop}>Recipent Name</FormattedText>

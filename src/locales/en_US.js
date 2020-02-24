@@ -402,7 +402,12 @@ const strings = {
   transaction_details_copy_tx_id: 'Copy Transaction ID',
   transaction_details_copy_signed_tx: 'Copy Signed Raw Hex',
   transaction_details_modal_debug_info: 'Debug Info:\n',
+<<<<<<< HEAD
   transaction_history_permission: 'Would you like to share the entire transaction history of %s with this partner?',
+=======
+  transaction_details_fiat_modal_header: '%s AMOUNT',
+  transaction_details_fiat_label: 'Choose an amount',
+>>>>>>> 351188ed6... Added Transaction Detaails Fiat input and Payee Name Input
   string_fee_with_brackets: '(Fee)',
   title_Header: 'Header',
   back_button_text: 'Back',
