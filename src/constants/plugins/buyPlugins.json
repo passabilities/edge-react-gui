@@ -518,6 +518,63 @@
     "addOnUrl": "?country=AU&payment=BLUEONLINE"
   },
   {
+    "id": "banxa.auspost",
+    "pluginId": "banxa",
+    "paymentType": {
+      "bank": true
+    },
+    "description": "Fee: 4-6% / Settlement: 5 min-24 hours\nLimit: $9000/day",
+    "title": "Australia Post",
+    "partnerIconPath": "https://edge.app/wp-content/uploads/2019/08/banxa.png",
+    "countryCodes": {
+      "AU": true
+    },
+    "cryptoCodes": [
+      "BTC",
+      "ETH"
+    ],
+    "paymentTypeLogoKey": "auspost",
+    "addOnUrl": "?payment_id=5033&country=au"
+  },
+  {
+    "id": "banxa.payid",
+    "pluginId": "banxa",
+    "paymentType": {
+      "bank": true
+    },
+    "description": "Fee: 4-6% / Settlement: 5 min-24 hours\nLimit: $9000/day",
+    "title": "PayID",
+    "partnerIconPath": "https://edge.app/wp-content/uploads/2019/08/banxa.png",
+    "countryCodes": {
+      "AU": true
+    },
+    "cryptoCodes": [
+      "BTC",
+      "ETH"
+    ],
+    "paymentTypeLogoKey": "payid",
+    "addOnUrl": "?payment_id=5035&country=au"
+  },
+  {
+    "id": "banxa.bpay",
+    "pluginId": "banxa",
+    "paymentType": {
+      "bank": true
+    },
+    "description": "Fee: 4-6% / Settlement: 5 min-24 hours\nLimit: $9000/day",
+    "title": "BPay",
+    "partnerIconPath": "https://edge.app/wp-content/uploads/2019/08/banxa.png",
+    "countryCodes": {
+      "AU": true
+    },
+    "cryptoCodes": [
+      "BTC",
+      "ETH"
+    ],
+    "paymentTypeLogoKey": "bpay",
+    "addOnUrl": "?payment_id=5034&country=au"
+  },
+  {
     "id": "bits of gold",
     "pluginId": "bitsofgold",
     "paymentType": "bank",
@@ -560,6 +617,18 @@
   },
   {
     "id": "banxa.cash",
+    "priority": 7
+  },
+  {
+    "id": "banxa.bpay",
+    "priority": 8
+  },
+  {
+    "id": "banxa.auspost",
+    "priority": 10
+  },
+  {
+    "id": "banxa.payid",
     "priority": 7
   },
   {
