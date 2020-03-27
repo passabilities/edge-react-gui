@@ -521,7 +521,7 @@
     "id": "banxa.auspost",
     "pluginId": "banxa",
     "paymentType": {
-      "bank": true
+      "cash": true
     },
     "description": "Fee: 4-6% / Settlement: 5 min-24 hours\nLimit: $9000/day",
     "title": "Australia Post",
@@ -533,7 +533,7 @@
       "BTC",
       "ETH"
     ],
-    "paymentTypeLogoKey": "auspost",
+    "paymentTypeLogoKey": "cash",
     "addOnUrl": "?payment_id=5033&country=au"
   },
   {
