@@ -1,12 +1,12 @@
 PODS:
   - boost-for-react-native (1.63.0)
-  - BugsnagReactNative (7.3.5):
+  - BugsnagReactNative (7.8.1):
     - React
   - BVLinearGradient (2.5.6):
     - React
   - CocoaAsyncSocket (7.6.4)
   - CocoaLibEvent (1.0.0)
-  - disklet (0.4.5):
+  - disklet (0.4.6):
     - React
   - DoubleConversion (1.1.6)
   - edge-login-ui-rn (0.7.0):
@@ -346,14 +346,14 @@ PODS:
     - React
   - react-native-netinfo (5.9.10):
     - React-Core
-  - react-native-randombytes (3.5.3):
-    - React
+  - react-native-randombytes (3.6.0):
+    - React-Core
   - react-native-safari-view (1.0.0):
     - React
   - react-native-smart-splash-screen (2.3.5):
     - React
-  - react-native-webview (10.2.3):
-    - React
+  - react-native-webview (10.10.2):
+    - React-Core
   - React-RCTActionSheet (0.63.4):
     - React-Core/RCTActionSheetHeaders (= 0.63.4)
   - React-RCTAnimation (0.63.4):
@@ -418,13 +418,13 @@ PODS:
     - React
   - ReactNativePermissions (1.0.6):
     - React
-  - RNCAsyncStorage (1.6.2):
-    - React
+  - RNCAsyncStorage (1.12.1):
+    - React-Core
   - RNCClipboard (1.5.1):
     - React-Core
-  - RNDateTimePicker (3.0.2):
-    - React
-  - RNDeviceInfo (5.6.1):
+  - RNDateTimePicker (3.0.9):
+    - React-Core
+  - RNDeviceInfo (5.6.5):
     - React
   - RNFBAnalytics (6.7.2):
     - Firebase/Analytics (~> 6.13.0)
@@ -701,11 +701,11 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  BugsnagReactNative: fc7d6fb2127e53a8bfc79130b58263da363bb94b
+  BugsnagReactNative: 7ebad0f8b064857f2288399b4d37cdb60cbf9c71
   BVLinearGradient: e3aad03778a456d77928f594a649e96995f1c872
   CocoaAsyncSocket: 694058e7c0ed05a9e217d1b3c7ded962f4180845
   CocoaLibEvent: 2fab71b8bd46dd33ddb959f7928ec5909f838e3f
-  disklet: 4f586f90b70fdb46f06614a5b7342eda5c90f253
+  disklet: a6220d6554cc05696bd0091c7861632bf78eb7df
   DoubleConversion: cde416483dac037923206447da6e1454df403714
   edge-login-ui-rn: bd6391d1cdb2cad6766e8c6d76bd3492ae2c64f8
   FBLazyVector: 3bb422f41b18121b71783a905c10e58606f7dc3e
@@ -752,10 +752,10 @@ SPEC CHECKSUMS:
   react-native-mail: 88305252f4c3fb0157015ff8a7ac9c41b321a0dd
   react-native-mymonero-core: c5e0e039b4977be65ed936a1d5301da3448edff7
   react-native-netinfo: 30fb89fa913c342be82a887b56e96be6d71201dd
-  react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
+  react-native-randombytes: b6677f7d495c27e9ee0dbd77ebc97b3c59173729
   react-native-safari-view: 955d7160d159241b8e9395d12d10ea0ef863dcdd
   react-native-smart-splash-screen: a961513689f11d63e8496684c2fa4be2d24fe23b
-  react-native-webview: 0bacc79175bc44869e4c1a015b9bc21df8cf4feb
+  react-native-webview: 0aa2cde4ee7e3e1c5fffdf64dbce9c709aa18155
   React-RCTActionSheet: 89a0ca9f4a06c1f93c26067af074ccdce0f40336
   React-RCTAnimation: 1bde3ecc0c104c55df246eda516e0deb03c4e49b
   React-RCTBlob: a97d378b527740cc667e03ebfa183a75231ab0f0
@@ -768,10 +768,10 @@ SPEC CHECKSUMS:
   ReactCommon: 73d79c7039f473b76db6ff7c6b159c478acbbb3b
   ReactNativeART: 78edc68dd4a1e675338cd0cd113319cf3a65f2ab
   ReactNativePermissions: bf462424ca7823d1b8e6cb463184d6e7f151971b
-  RNCAsyncStorage: 60a80e72d95bf02a01cace55d3697d9724f0d77f
+  RNCAsyncStorage: b03032fdbdb725bea0bd9e5ec5a7272865ae7398
   RNCClipboard: 41d8d918092ae8e676f18adada19104fa3e68495
-  RNDateTimePicker: a84d2b439666c9243d42a8396c588d4d1d36e3f3
-  RNDeviceInfo: b6e650fbd234732c759544218657d549b4339038
+  RNDateTimePicker: 8a51a2216c307769e69ef827293d59549ab1ca23
+  RNDeviceInfo: c5f8f3a456adcbba405ace475254b08febc4c095
   RNFBAnalytics: 29bc4baf70da8dc04238d2e1c050367264d2f440
   RNFBApp: 7b539bb25520fa73d6a240f5c6ea569e27683645
   RNFBIid: 8f673a41f45f04273d0759c5df0aef113b580822
@@ -789,4 +789,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 68877d18b199959276325d4c6448ef9bbabe31b9
 
-COCOAPODS: 1.10.1
+COCOAPODS: 1.10.0
